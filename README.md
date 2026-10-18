@@ -3,7 +3,7 @@
 The RaceDay API is the back end of the RaceDay system. It handles users, events, categories,
 enrolments and results, and it enforces role-based access for **Organisers** and **Participants**.
 
-- **Video demo (YouTube, unlisted):** [PASTE YOUR YOUTUBE LINK HERE]
+- **Video demo (YouTube, unlisted):** [(https://youtu.be/UKxriwdSIQ8)]
 - **Build status:** ![<img width="932" height="475" alt="image" src="https://github.com/user-attachments/assets/4acde1f3-26f3-4ba8-961f-378737323eea" /> 
 ](![Uploading image.png…]()
 ) 
