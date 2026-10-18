@@ -4,8 +4,8 @@ The RaceDay API is the back end of the RaceDay system. It handles users, events,
 enrolments and results, and it enforces role-based access for **Organisers** and **Participants**.
 
 - **Video demo (YouTube, unlisted):** [PASTE YOUR YOUTUBE LINK HERE]
-- **Build status:** ![Green build](docs/green-build.png) *(add your screenshot of the green GitHub Actions run as `docs/green-build.png`)*
-
+- **Build status:** ![<img width="932" height="475" alt="image" src="https://github.com/user-attachments/assets/4acde1f3-26f3-4ba8-961f-378737323eea" />
+](docs/green-build.png) 
 ## Fixed Part
 I Updated my ERD from part 1 because it did not contain "Organiser" and "Participants" [<img width="2120" height="1760" alt="RaceDay_ERD (1)" src="https://github.com/user-attachments/assets/cf942677-6ab4-4dc3-9bb9-eae6eb86e7d8" />
 ]
