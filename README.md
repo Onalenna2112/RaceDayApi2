@@ -9,6 +9,7 @@ enrolments and results, and it enforces role-based access for **Organisers** and
 ## Fixed Part
 I Updated my ERD from part 1 because it did not contain "Organiser" and "Participants" [<img width="2120" height="1760" alt="RaceDay_ERD (1)" src="https://github.com/user-attachments/assets/cf942677-6ab4-4dc3-9bb9-eae6eb86e7d8" />
 ]
+So that is the updated version of my ERD.
 
 ## Technology
 
