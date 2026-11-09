@@ -19,6 +19,7 @@ var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("Jwt:Key is missing from configuration.");
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

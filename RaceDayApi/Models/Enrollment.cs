@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,7 +18,7 @@ namespace RaceDayApi.Models
         public Category? Category { get; set; }
 
         public DateTime EnrolmentDate { get; set; } = DateTime.UtcNow;
-        public string Status { get; set; } = "Enrolled";
+        public string Status { get; set; } = "Confirmed";
 
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
         public Result? Result { get; set; }

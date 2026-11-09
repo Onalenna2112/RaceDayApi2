@@ -1,0 +1,23 @@
+@model EventSummary
+<article class="card event-card h-100">
+    <a asp-controller="Events" asp-action="Details" asp-route-id="@Model.EventId" class="event-card-banner">
+        @if (!string.IsNullOrEmpty(Model.BannerImageUrl))
+        {
+            <img src="@Model.BannerImageUrl" alt="Banner for @Model.Name" loading="lazy" />
+        }
+        else
+        {
+            <div class="banner-placeholder"><i class="bi @Format.TypeIcon(Model.EventType)"></i></div>
+        }
+        <span class="type-chip"><i class="bi @Format.TypeIcon(Model.EventType)"></i> @Model.EventType</span>
+    </a>
+    <div class="card-body d-flex flex-column">
+        <h3 class="event-title">@Model.Name</h3>
+        <ul class="event-meta">
+            <li><i class="bi bi-calendar-event"></i> @Format.DateTimeText(Model.EventDate)</li>
+            <li><i class="bi bi-geo-alt-fill"></i> @Model.Location</li>
+            <li><i class="bi bi-signpost-split-fill"></i> @Format.Km(Model.Distance)</li>
+        </ul>
+        <a asp-controller="Events" asp-action="Details" asp-route-id="@Model.EventId" class="btn btn-rd mt-auto">View event</a>
+    </div>
+</article>

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using RaceDayApi.Data;
@@ -37,7 +37,7 @@ public class EnrolmentApiTests : IClassFixture<RaceDayWebFactory>
         Assert.Equal(participant.UserId, saved.ParticipantID);
         Assert.Equal(eventId, saved.EventID);
         Assert.Equal(categoryId, saved.CategoryID);
-        Assert.Equal("Enrolled", saved.Status);
+        Assert.Equal("Confirmed", saved.Status);
     }
 
     [Fact]

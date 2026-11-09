@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Welcome";
+}
+<section class="hero">
+    <div class="hero-inner">
+        <p class="hero-kicker">Run. Walk. Ride.</p>
+        <h1 class="hero-title">Your race day<br />starts here</h1>
+        <p class="hero-text">Find events, pick your category and enter in seconds. Organisers manage events, enrolments and results in one place.</p>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-rd btn-lg" asp-controller="Account" asp-action="Register">Join RaceDay</a>
+            <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Login">Log in</a>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mt-1">
+    <div class="col-md-4">
+        <div class="feature-card">
+            <i class="bi bi-search feature-icon"></i>
+            <h2>For participants</h2>
+            <p>Browse upcoming runs, walks and rides. Filter by type, pick your category and enter with one click.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-card">
+            <i class="bi bi-speedometer2 feature-icon"></i>
+            <h2>For organisers</h2>
+            <p>Create events with banners, set up age and distance categories and see who has entered.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-card">
+            <i class="bi bi-trophy-fill feature-icon"></i>
+            <h2>Results you can be proud of</h2>
+            <p>Finish times and positions are published after the race, so every runner can see their race history.</p>
+        </div>
+    </div>
+</section>

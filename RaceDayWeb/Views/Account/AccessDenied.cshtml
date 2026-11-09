@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Access denied";
+    var user = UserSession.Get(Context);
+}
+<div class="message-page">
+    <i class="bi bi-shield-lock-fill message-icon"></i>
+    <h1 class="display-title">That page is not for your role</h1>
+    <p class="lead">
+        @if (user != null)
+        {
+            <text>You are logged in as @user.Role, and this page belongs to the other role.</text>
+        }
+        else
+        {
+            <text>Please log in to continue.</text>
+        }
+    </p>
+    @if (user != null)
+    {
+        if (user.Role == Roles.Organiser)
+        {
+            <a class="btn btn-rd" asp-controller="Organiser" asp-action="Dashboard">Go to my dashboard</a>
+        }
+        else
+        {
+            <a class="btn btn-rd" asp-controller="Events" asp-action="Index">Go to events</a>
+        }
+    }
+    else
+    {
+        <a class="btn btn-rd" asp-controller="Account" asp-action="Login">Log in</a>
+    }
+</div>

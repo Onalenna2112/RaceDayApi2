@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDayApi.Data;
@@ -71,7 +72,7 @@ namespace RaceDayApi.Controllers
                 EventID = id,
                 CategoryID = dto.CategoryID,
                 EnrolmentDate = DateTime.UtcNow,
-                Status = "Enrolled"
+                Status = "Confirmed"
             };
 
             _context.Enrollments.Add(enrolment);
@@ -154,6 +155,39 @@ namespace RaceDayApi.Controllers
             return Ok(enrolments);
         }
 
+        /// <summary>Change the status of an enrolment (Organiser only).</summary>
+        /// <remarks>Send status as "Pending", "Confirmed" or "Cancelled". New enrolments start as Confirmed.</remarks>
+        /// <response code="200">Status updated.</response>
+        /// <response code="400">Unknown status.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">You are not an Organiser, or the enrolment is for another Organiser's event.</response>
+        /// <response code="404">Enrolment not found.</response>
+        [HttpPut("enrolments/{id:int}/status")]
+        [Authorize(Roles = Roles.Organiser)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateEnrolmentStatus(int id, [FromBody] EnrolmentStatusDto dto)
+        {
+            var enrolment = await _context.Enrollments
+                .Include(e => e.Event)
+                .FirstOrDefaultAsync(e => e.EnrollmentID == id);
+            if (enrolment == null) return NotFound(new MessageResponse("Enrolment not found."));
+
+            if (enrolment.Event == null || enrolment.Event.OrganiserID != User.GetUserId())
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new MessageResponse("You can only change enrolments for your own events."));
+            }
+
+            var status = dto.Status.Trim();
+            enrolment.Status = char.ToUpperInvariant(status[0]) + status.Substring(1).ToLowerInvariant();
+
+            await _context.SaveChangesAsync();
+            return Ok(new MessageResponse("Enrolment status updated."));
+        }
+
         /// <summary>Cancel an enrolment.</summary>
         /// <remarks>A Participant can cancel their own enrolment. An Organiser can remove an enrolment from their own event.</remarks>
         /// <response code="200">Enrolment cancelled.</response>
@@ -193,5 +227,13 @@ namespace RaceDayApi.Controllers
             await _context.SaveChangesAsync();
             return Ok(new MessageResponse("Enrolment cancelled."));
         }
+    }
+
+    public class EnrolmentStatusDto
+    {
+        /// <summary>"Pending", "Confirmed" or "Cancelled".</summary>
+        [Required]
+        [RegularExpression("(?i)^(pending|confirmed|cancelled)$", ErrorMessage = "Status must be Pending, Confirmed or Cancelled.")]
+        public string Status { get; set; } = string.Empty;
     }
 }

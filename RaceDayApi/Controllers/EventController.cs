@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +23,19 @@ namespace RaceDayApi.Controllers
         }
 
         /// <summary>List all events.</summary>
-        /// <remarks>Both roles can use this. Add ?upcomingOnly=true to hide events that already happened.</remarks>
+        /// <remarks>
+        /// Both roles can use this. Optional filters: upcomingOnly=true hides events that already happened,
+        /// eventType (Run, Walk or Cycle) and search (matches the event name or location).
+        /// </remarks>
         /// <response code="200">The list of events, ordered by date.</response>
         /// <response code="401">Not logged in.</response>
         [HttpGet]
         [ProducesResponseType(typeof(List<EventSummaryResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetEvents([FromQuery] bool upcomingOnly = false)
+        public async Task<IActionResult> GetEvents(
+            [FromQuery] bool upcomingOnly = false,
+            [FromQuery] string? eventType = null,
+            [FromQuery] string? search = null)
         {
             var query = _context.Events.AsQueryable();
 
@@ -39,11 +45,50 @@ namespace RaceDayApi.Controllers
                 query = query.Where(e => e.EventDate >= now);
             }
 
+            if (!string.IsNullOrWhiteSpace(eventType))
+            {
+                var type = eventType.Trim();
+                query = query.Where(e => e.EventType == type);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var text = search.Trim();
+                query = query.Where(e => e.Name.Contains(text) || e.Location.Contains(text));
+            }
+
             var events = await query
                 .OrderBy(e => e.EventDate)
                 .Select(e => new EventSummaryResponse(
                     e.EventID, e.Name, e.Description, e.EventDate, e.Location, e.Distance, e.EventType,
-                    e.Organiser!.FullName))
+                    e.Organiser!.FullName, e.BannerImageUrl))
+                .ToListAsync();
+
+            return Ok(events);
+        }
+
+        /// <summary>List your own events with enrolment totals (Organiser only).</summary>
+        /// <remarks>Used by the Organiser dashboard.</remarks>
+        /// <response code="200">Your events, ordered by date.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">You are not an Organiser.</response>
+        [HttpGet("mine")]
+        [Authorize(Roles = Roles.Organiser)]
+        [ProducesResponseType(typeof(List<OrganiserEventResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetMyEvents()
+        {
+            var organiserId = User.GetUserId();
+            if (organiserId == null) return Unauthorized();
+
+            var events = await _context.Events
+                .Where(e => e.OrganiserID == organiserId)
+                .OrderBy(e => e.EventDate)
+                .Select(e => new OrganiserEventResponse(
+                    e.EventID, e.Name, e.EventDate, e.Location, e.EventType, e.BannerImageUrl,
+                    _context.Enrollments.Count(en => en.EventID == e.EventID),
+                    _context.Categories.Count(c => c.EventID == e.EventID)))
                 .ToListAsync();
 
             return Ok(events);
@@ -64,6 +109,7 @@ namespace RaceDayApi.Controllers
                 .Select(e => new EventDetailResponse(
                     e.EventID, e.Name, e.Description, e.EventDate, e.Location, e.Distance, e.EventType,
                     e.Organiser!.FullName,
+                    e.BannerImageUrl,
                     e.Categories
                         .Select(c => new CategoryResponse(c.CategoryID, c.Name, c.MinAge, c.MaxAge, c.Distance, c.EntryFee))
                         .ToList()))

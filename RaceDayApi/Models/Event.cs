@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,6 +16,7 @@ namespace RaceDayApi.Models
         public string Location { get; set; } = string.Empty;
         public decimal Distance { get; set; }
         public string EventType { get; set; } = string.Empty;
+        public string? BannerImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Category> Categories { get; set; } = new List<Category>();

@@ -1,0 +1,58 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+<div class="auth-wrap">
+    <div class="card auth-card">
+        <h1 class="display-title">Join RaceDay</h1>
+        <p class="text-muted">Create your account and choose how you will use RaceDay.</p>
+
+        <form asp-action="Register" method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="mb-3">
+                <label class="form-label d-block">I am a</label>
+                <div class="role-choice">
+                    <input type="radio" class="btn-check" asp-for="Role" value="Participant" id="rolePart" autocomplete="off" />
+                    <label class="btn btn-outline-rd" for="rolePart"><i class="bi bi-person-walking"></i> Participant</label>
+                    <input type="radio" class="btn-check" asp-for="Role" value="Organiser" id="roleOrg" autocomplete="off" />
+                    <label class="btn btn-outline-rd" for="roleOrg"><i class="bi bi-clipboard-data"></i> Organiser</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" autocomplete="name" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" autocomplete="email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div id="organiserCodeGroup" class="mb-3 @(Model.Role == Roles.Organiser ? "" : "d-none")">
+                <label asp-for="OrganiserCode" class="form-label"></label>
+                <input asp-for="OrganiserCode" class="form-control" autocomplete="off" />
+                <div class="form-text">Organiser accounts are protected. Ask the RaceDay owner for the organiser code.</div>
+                <span asp-validation-for="OrganiserCode" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-rd w-100 btn-lg">Create my account</button>
+        </form>
+
+        <p class="mt-3 mb-0 text-center">Already registered? <a asp-action="Login">Log in</a></p>
+    </div>
+</div>

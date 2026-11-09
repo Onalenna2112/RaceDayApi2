@@ -1,0 +1,71 @@
+@model ResultsPageViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = "Results - " + ev.Name;
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Organiser" asp-action="Events">My events</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@ev.Name</li>
+    </ol>
+</nav>
+
+<div class="page-head">
+    <h1 class="display-title">Results entry</h1>
+    <p class="text-muted mb-0">
+        Capture and publish finish times and finishing positions for <strong>@ev.Name</strong>.
+        Saved results show on each Participant's My results page straight away.
+    </p>
+</div>
+
+@if (Model.Rows.Count == 0)
+{
+    <div class="empty-state">
+        <i class="bi bi-people"></i>
+        <h2>No Participants to record</h2>
+        <p>Results can be entered once Participants have enrolled.</p>
+        <a class="btn btn-outline-rd" asp-controller="OrganiserEnrolments" asp-action="Index" asp-route-eventId="@ev.EventId">View enrolments</a>
+    </div>
+}
+else
+{
+    <div class="card table-card">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Finish time (hh:mm:ss)</th>
+                        <th>Position</th>
+                        <th class="text-end">Save</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        var formId = "result-form-" + row.Enrolment.EnrolmentId;
+                        <tr>
+                            <td class="fw-semibold">@row.Enrolment.ParticipantName</td>
+                            <td>@row.Enrolment.CategoryName</td>
+                            <td><partial name="_StatusBadge" model="row.Enrolment.Status" /></td>
+                            <td>
+                                <input type="text" name="finishTime" form="@formId" class="form-control form-control-sm finish-input" placeholder="01:25:30" pattern="\d{1,2}:\d{2}:\d{2}" inputmode="numeric" value="@(row.Result?.FinishTime)" required />
+                            </td>
+                            <td>
+                                <input type="number" name="position" form="@formId" class="form-control form-control-sm position-input" min="1" placeholder="1" value="@(row.Result?.Position)" required />
+                            </td>
+                            <td class="text-end">
+                                <form id="@formId" asp-action="Save" asp-route-eventId="@ev.EventId" asp-route-enrolmentId="@row.Enrolment.EnrolmentId" method="post"></form>
+                                <button type="submit" form="@formId" class="btn btn-sm @(row.Result == null ? "btn-rd" : "btn-outline-rd")">
+                                    @(row.Result == null ? "Save and publish" : "Update")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

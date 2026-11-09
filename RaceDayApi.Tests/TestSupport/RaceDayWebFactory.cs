@@ -1,12 +1,14 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using RaceDayApi.Data;
 using RaceDayApi.Models;
+using RaceDayApi.Services;
 
 namespace RaceDayApi.Tests.TestSupport;
 
@@ -37,6 +39,10 @@ public class RaceDayWebFactory : WebApplicationFactory<Program>
             }
 
             services.AddDbContext<RaceDayDbContext>(options => options.UseInMemoryDatabase(_databaseName));
+
+            // Tests must never talk to Azure, so the blob service is replaced with a fake.
+            services.RemoveAll<IBlobStorageService>();
+            services.AddSingleton<IBlobStorageService, FakeBlobStorageService>();
         });
     }
 

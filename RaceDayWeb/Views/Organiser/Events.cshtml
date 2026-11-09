@@ -1,0 +1,76 @@
+@model List<OrganiserEvent>
+@{
+    ViewData["Title"] = "My events";
+}
+<div class="page-head d-flex flex-wrap justify-content-between align-items-end gap-2">
+    <div>
+        <h1 class="display-title">My events</h1>
+        <p class="text-muted mb-0">Create, edit and delete your events, and manage their categories, enrolments and results.</p>
+    </div>
+    <a class="btn btn-rd" asp-action="CreateEvent"><i class="bi bi-plus-lg"></i> Create event</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+        <i class="bi bi-calendar-plus"></i>
+        <h2>No events yet</h2>
+        <p>Create your first event to get started.</p>
+        <a class="btn btn-rd" asp-action="CreateEvent">Create event</a>
+    </div>
+}
+else
+{
+    <div class="card table-card">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Categories</th>
+                        <th>Enrolments</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    @if (!string.IsNullOrEmpty(e.BannerImageUrl))
+                                    {
+                                        <img src="@e.BannerImageUrl" alt="" class="thumb" />
+                                    }
+                                    else
+                                    {
+                                        <div class="thumb thumb-placeholder"><i class="bi @Format.TypeIcon(e.EventType)"></i></div>
+                                    }
+                                    <div>
+                                        <a asp-controller="Events" asp-action="Details" asp-route-id="@e.EventId" class="fw-semibold">@e.Name</a>
+                                        <div class="small text-muted">@e.Location</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@Format.DateTimeText(e.EventDate)</td>
+                            <td><i class="bi @Format.TypeIcon(e.EventType)"></i> @e.EventType</td>
+                            <td><span class="count-pill">@e.CategoryCount</span></td>
+                            <td><span class="count-pill">@e.EnrolmentCount</span></td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary" asp-action="EditEvent" asp-route-id="@e.EventId" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <a class="btn btn-sm btn-outline-secondary" asp-controller="OrganiserCategories" asp-action="Index" asp-route-eventId="@e.EventId" title="Categories"><i class="bi bi-tags"></i></a>
+                                <a class="btn btn-sm btn-outline-secondary" asp-controller="OrganiserEnrolments" asp-action="Index" asp-route-eventId="@e.EventId" title="Enrolments"><i class="bi bi-people"></i></a>
+                                <a class="btn btn-sm btn-outline-secondary" asp-controller="OrganiserResults" asp-action="Index" asp-route-eventId="@e.EventId" title="Results"><i class="bi bi-trophy"></i></a>
+                                <form asp-action="DeleteEvent" asp-route-id="@e.EventId" method="post" class="d-inline" data-confirm="Delete the event @(e.Name)? This cannot be undone.">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -1,0 +1,113 @@
+@model EventDetailsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = ev.Name;
+    var alreadyEnrolled = Model.MyEnrolment != null;
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        @if (Model.IsParticipant)
+        {
+            <li class="breadcrumb-item"><a asp-action="Index">Events</a></li>
+        }
+        else
+        {
+            <li class="breadcrumb-item"><a asp-controller="Organiser" asp-action="Events">My events</a></li>
+        }
+        <li class="breadcrumb-item active" aria-current="page">@ev.Name</li>
+    </ol>
+</nav>
+
+<div class="detail-banner">
+    @if (!string.IsNullOrEmpty(ev.BannerImageUrl))
+    {
+        <img src="@ev.BannerImageUrl" alt="Banner for @ev.Name" />
+    }
+    else
+    {
+        <div class="banner-placeholder banner-large"><i class="bi @Format.TypeIcon(ev.EventType)"></i></div>
+    }
+    <span class="type-chip type-chip-lg"><i class="bi @Format.TypeIcon(ev.EventType)"></i> @ev.EventType</span>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-7">
+        <h1 class="display-title">@ev.Name</h1>
+        <div class="info-grid">
+            <div><i class="bi bi-calendar-event"></i><span>Date</span><strong>@Format.DateTimeText(ev.EventDate)</strong></div>
+            <div><i class="bi bi-geo-alt-fill"></i><span>Location</span><strong>@ev.Location</strong></div>
+            <div><i class="bi bi-signpost-split-fill"></i><span>Distance</span><strong>@Format.Km(ev.Distance)</strong></div>
+            <div><i class="bi bi-person-badge"></i><span>Organiser</span><strong>@ev.OrganiserName</strong></div>
+        </div>
+        <h2 class="section-title">About this event</h2>
+        <p class="event-description">@ev.Description</p>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card enrol-card">
+            <div class="card-body">
+                <h2 class="section-title mt-0">Categories</h2>
+
+                @if (ev.Categories.Count == 0)
+                {
+                    <p class="text-muted mb-0">The organiser has not added any categories yet. Please check back soon.</p>
+                }
+                else if (alreadyEnrolled)
+                {
+                    <ul class="category-list">
+                        @foreach (var c in ev.Categories)
+                        {
+                            <li>
+                                <strong>@c.Name</strong>
+                                <span>Ages @c.MinAge to @c.MaxAge &middot; @Format.Km(c.Distance) &middot; @Format.Money(c.EntryFee)</span>
+                            </li>
+                        }
+                    </ul>
+                    <div class="alert alert-success mt-3 mb-0">
+                        <i class="bi bi-check-circle-fill"></i> You are enrolled in <strong>@(Model.MyEnrolment?.CategoryName)</strong>.
+                        <partial name="_StatusBadge" model="@(Model.MyEnrolment?.Status ?? string.Empty)" />
+                        <div class="mt-2"><a asp-controller="Participant" asp-action="MyEvents">See my events</a></div>
+                    </div>
+                }
+                else if (Model.IsParticipant && !Model.EventIsPast)
+                {
+                    <form asp-controller="Events" asp-action="Enrol" method="post">
+                        <input type="hidden" name="eventId" value="@ev.EventId" />
+                        <p class="text-muted">Choose your category, then enter the event.</p>
+                        @foreach (var c in ev.Categories)
+                        {
+                            <label class="category-option">
+                                <input type="radio" name="categoryId" value="@c.CategoryId" required />
+                                <span>
+                                    <strong>@c.Name</strong>
+                                    <small>Ages @c.MinAge to @c.MaxAge &middot; @Format.Km(c.Distance) &middot; @Format.Money(c.EntryFee)</small>
+                                </span>
+                            </label>
+                        }
+                        <button type="submit" class="btn btn-rd btn-lg w-100 mt-3">Enter this event</button>
+                    </form>
+                }
+                else
+                {
+                    <ul class="category-list">
+                        @foreach (var c in ev.Categories)
+                        {
+                            <li>
+                                <strong>@c.Name</strong>
+                                <span>Ages @c.MinAge to @c.MaxAge &middot; @Format.Km(c.Distance) &middot; @Format.Money(c.EntryFee)</span>
+                            </li>
+                        }
+                    </ul>
+                    @if (Model.IsParticipant && Model.EventIsPast)
+                    {
+                        <div class="alert alert-secondary mt-3 mb-0">This event has already taken place, so enrolment is closed.</div>
+                    }
+                    else if (!Model.IsParticipant)
+                    {
+                        <div class="alert alert-info mt-3 mb-0">You are viewing this event as an Organiser. Participants enter from this page.</div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

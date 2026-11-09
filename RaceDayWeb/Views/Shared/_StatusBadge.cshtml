@@ -1,0 +1,19 @@
+@model string
+@{
+    var status = Model ?? string.Empty;
+    var css = status.ToLowerInvariant() switch
+    {
+        "confirmed" => "status-confirmed",
+        "pending" => "status-pending",
+        "cancelled" => "status-cancelled",
+        _ => "status-other"
+    };
+    var icon = status.ToLowerInvariant() switch
+    {
+        "confirmed" => "bi-check-circle-fill",
+        "pending" => "bi-hourglass-split",
+        "cancelled" => "bi-x-circle-fill",
+        _ => "bi-circle"
+    };
+}
+<span class="status-badge @css"><i class="bi @icon"></i> @status</span>

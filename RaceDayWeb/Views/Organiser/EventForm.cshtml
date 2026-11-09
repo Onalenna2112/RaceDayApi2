@@ -1,0 +1,81 @@
+@model EventFormViewModel
+@{
+    var isEdit = Model.Id != null;
+    ViewData["Title"] = ViewData["FormTitle"]?.ToString() ?? "Event";
+    var eventTypes = ViewBag.EventTypes as string[] ?? new[] { "Run", "Walk", "Cycle" };
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Events">My events</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+    </ol>
+</nav>
+
+<div class="page-head">
+    <h1 class="display-title">@ViewData["Title"]</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="@(isEdit ? "EditEvent" : "CreateEvent")" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input type="hidden" asp-for="ExistingBannerUrl" />
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="EventType" class="form-label"></label>
+                    <select asp-for="EventType" class="form-select">
+                        @foreach (var type in eventTypes)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+                    <span asp-validation-for="EventType" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="EventDate" class="form-label">Date and time</label>
+                    <input type="datetime-local" id="EventDate" name="EventDate" class="form-control" value="@(Model.EventDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+                    <span asp-validation-for="EventDate" class="text-danger small"></span>
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="Location" class="form-label"></label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Distance" class="form-label"></label>
+                    <input asp-for="Distance" type="number" step="0.1" min="0.1" class="form-control" />
+                    <span asp-validation-for="Distance" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="BannerFile" class="form-label"></label>
+                    @if (!string.IsNullOrEmpty(Model.ExistingBannerUrl))
+                    {
+                        <div class="mb-2"><img src="@Model.ExistingBannerUrl" alt="Current banner" class="banner-preview" /></div>
+                    }
+                    <input asp-for="BannerFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                    <div class="form-text">Optional. JPG, PNG or WEBP, up to 5 MB. @(isEdit ? "Choose a file only if you want to replace the current banner." : "")</div>
+                    <span asp-validation-for="BannerFile" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-rd btn-lg">@(isEdit ? "Save changes" : "Create event")</button>
+                <a class="btn btn-outline-secondary btn-lg" asp-action="Events">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
